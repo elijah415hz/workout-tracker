@@ -1,3 +1,5 @@
+let currentWorkout;
+
 function createAddWorkout() {
     const workspace = $("#workspace")
     workspace.empty();
@@ -9,7 +11,7 @@ function createAddWorkout() {
     const name = $('<input id="nameInput" class="form-control" type="text" placeholder="Workout Name">')
     const inputGroup = $('<div class="input-group">')
     const append = $('<div class="input-group-append">')
-    const createBtn = $('<button id="createBtn" type="button" class="btn btn-success">').text("Create")
+    const createBtn = $('<button id="doneBtn" type="button" class="btn btn-success">').text("Done")
     append.append(createBtn);
     inputGroup.append(name)
     inputGroup.append(append)
@@ -19,22 +21,38 @@ function createAddWorkout() {
     row.append(card)
     row.append(emptyCol2);
     workspace.append(row)
-    $("#addWorkoutForm").on("submit", function(event) {
+    $("#addWorkoutForm").on("submit", function (event) {
         event.preventDefault()
         const workoutName = name.val()
+        storeWorkout(workoutName)
         displayWorkout(workoutName)
     })
-    $("#createBtn").on("click", function(event) {
+    $("#createBtn").on("click", function (event) {
         event.preventDefault()
         const workoutName = name.val()
+        storeWorkout(workoutName)
         displayWorkout(workoutName)
     })
+}
+
+function storeWorkout(name) {
+    $.ajax({
+        type: "POST",
+        url: "/api/workouts",
+        data: {
+            name: name
+        }
+    }).then(result => {
+        currentWorkout = result._id
+        console.log(result)
+    })
+        .catch(err => { console.error(err) })
 }
 
 function displayWorkout(name) {
     const workspace = $("#workspace")
     workspace.empty();
-    const header = $(`<h4 class="display-4 text-center">${name}</h4>`)
+    const header = $(`<h4 id="workoutName" class="display-4 text-center">${name}</h4>`)
     const saveBtn = $("<button id='saveBtn' class='btn btn-success'>").text("Save")
     const headerCard = $("<div class='card mb-3'>")
     const headerCardBody = $("<div id='headerBody' class='card-body text-center'>")
@@ -42,6 +60,7 @@ function displayWorkout(name) {
     headerCardBody.append(saveBtn)
     headerCard.append(headerCardBody);
     workspace.append(headerCard);
+
     const row = $("<div class='row mb-3'>");
     const emptyCol1 = $("<div class='col'>");
     const card = $('<form id ="addExerciseForm" class="card col-md-8 col-sm-12">');
@@ -71,11 +90,26 @@ function displayWorkout(name) {
     $("#addExerciseForm").on("submit", function (event) {
         event.preventDefault();
         const data = {
-            exercise: exercise.val(),
+            name: exercise.val(),
             [select.val()]: number.val()
         }
+        storeExercise(data)
         displayExercise(data)
     })
+}
+
+function storeExercise(data) {
+    $.ajax({
+        type: "POST",
+        url: "/api/exercises",
+        data: {
+            exercise: data,
+            workoutId: currentWorkout
+        }
+    }).then(result => {
+        currentWorkout = result._id
+        console.log(result)
+    }).catch(err => { console.error(err) })
 }
 
 function displayExercise(data) {
@@ -84,9 +118,8 @@ function displayExercise(data) {
     $("#number").val("");
     const headerBody = $("#headerBody")
     const row = $("<div class='row mt-3'>");
-    const exercise = $("<div class='col-sm-6'>").text(data.exercise)
-    
-    const quantifier = Object.keys(data).filter(key => key !== "exercise")[0]
+    const exercise = $("<div class='col-sm-6'>").text(data.name)
+    const quantifier = Object.keys(data).filter(key => key !== "name")[0]
     console.log(quantifier)
     const number = $("<div class='col'>").text(data[quantifier])
     const thing = $("<div class='col'>").text(quantifier)
