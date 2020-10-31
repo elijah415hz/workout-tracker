@@ -44,6 +44,19 @@ module.exports = function (app) {
     }
   })
 
+  app.put("/api/exercises/:id", function (req, res) {
+    console.log(req.body)
+    db.Exercise.update({_id: mongoose.Types.ObjectId(req.params.id)}, 
+    req.body,
+    {overwrite: true}
+    ).then(result => {
+      res.json(result)
+    }).catch(err => {
+      console.error(err);
+      res.json(err)
+    })
+  })
+
 
   // DELETE route 
   app.delete("/api/workouts/:id", async function (req, res) {

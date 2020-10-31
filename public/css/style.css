@@ -1,3 +1,15 @@
 /* body {
     background-color: forestgreen
 } */
+
+/* TODO: Why is this not targeting the add form? */
+select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none; 
+ }
+
+select::-ms-expand {
+    display: none;
+}

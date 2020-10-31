@@ -5,11 +5,11 @@ $.ajax({
     url: "/api/workouts/populated",
 }).then(workouts => {
     if (workouts.length > 0) {
-        for (workout of workouts) {
-            console.log(workout.name)
+        for (let workout of workouts) {
+            console.log(workout._id)
             let workoutCard = displayWorkout(workout.name, false);
             for (exercise of workout.exercises) {
-                displayExercise(exercise, workoutCard)
+                displayExercise(exercise, workoutCard, exercise._id)
             }
         }
     }
@@ -65,7 +65,7 @@ function storeWorkout(name) {
         .catch(err => { console.error(err) })
 }
 
-function displayWorkout(name, newWorkout=true) {
+function displayWorkout(name, newWorkout = true) {
     const workspace = $("#workspace")
     workspace.empty();
     const header = $('<h4 id="workoutName" class="display-4 text-center">').text(name)
@@ -77,58 +77,56 @@ function displayWorkout(name, newWorkout=true) {
     if (newWorkout) {
         headerCardBody.append(doneBtn)
         workspace.append(headerCard);
+        const row = $("<div class='row mb-3'>");
+        const emptyCol1 = $("<div class='col'>");
+        const card = $('<form id ="addExerciseForm" class="card col-md-8 col-sm-12">');
+        const emptyCol2 = $("<div class='col'>");
+        const cardBody = $('<div class="card-body input-group">');
+        const exercise = $('<input id="exercise" class="form-control mr-3" type="text" placeholder="Exercise">');
+        const append = $('<div class="input-group-append">');
+        const number = $('<input id="number" type="number" placeholder="0" class="form-control mr-3" style="width:80px">');
+        const select = $('<select id="select" class="custom-select mr-3" style="width:100px">');
+        const reps = $('<option value="reps">').text("Reps");
+        const minutes = $('<option value="minutes">').text("Minutes");
+        const miles = $('<option value="miles">').text("Miles");
+        const add = $('<button id="addBtn" class="btn btn-success">').text("Add");
+        select.append(reps);
+        select.append(minutes);
+        select.append(miles);
+        append.append(number);
+        append.append(select);
+        append.append(add);
+        cardBody.append(exercise);
+        cardBody.append(append);
+        card.append(cardBody);
+        row.append(emptyCol1);
+        row.append(card);
+        row.append(emptyCol2);
+        workspace.append(row);
+        $("#addExerciseForm").on("submit", function (event) {
+            event.preventDefault();
+            const select = $("#select").val()
+            const exercise = $("#exercise").val()
+            const number = $("#number").val()
+            console.log("Selected: ", select)
+            if (select && exercise && number) {
+                const data = {
+                    name: exercise,
+                    [select]: number
+                }
+                storeExercise(data)
+                displayExercise(data, $("#currentWorkout"))
+            } else {
+                alert("Please fill in all fields")
+            }
+        })
+        $("#doneBtn").on("click", function () {
+            location.reload()
+        })
     } else {
         $("#savedWorkouts").append(headerCard)
         return headerCard
     }
-    if (newWorkout) {
-    const row = $("<div class='row mb-3'>");
-    const emptyCol1 = $("<div class='col'>");
-    const card = $('<form id ="addExerciseForm" class="card col-md-8 col-sm-12">');
-    const emptyCol2 = $("<div class='col'>");
-    const cardBody = $('<div class="card-body input-group">');
-    const exercise = $('<input id="exercise" class="form-control mr-3" type="text" placeholder="Exercise">');
-    const append = $('<div class="input-group-append">');
-    const number = $('<input id="number" type="number" placeholder="0" class="form-control mr-3" style="width:80px">');
-    const select = $('<select id="select" class="custom-select mr-3" style="width:100px">');
-    const reps = $('<option value="reps">').text("Reps");
-    const minutes = $('<option value="minutes">').text("Minutes");
-    const miles = $('<option value="miles">').text("Miles");
-    const add = $('<button id="addBtn" class="btn btn-success">').text("Add");
-    select.append(reps);
-    select.append(minutes);
-    select.append(miles);
-    append.append(number);
-    append.append(select);
-    append.append(add);
-    cardBody.append(exercise);
-    cardBody.append(append);
-    card.append(cardBody);
-    row.append(emptyCol1);
-    row.append(card);
-    row.append(emptyCol2);
-    workspace.append(row);
-    }
-    $("#addExerciseForm").on("submit", function (event) {
-        event.preventDefault();
-        const select = $("#select").val()
-        const exercise = $("#exercise").val()
-        const number = $("#number").val()
-        if (select && exercise && number) {
-            console.log
-            const data = {
-                name: exercise,
-                [select]: number
-            }
-            storeExercise(data)
-            displayExercise(data, $("#currentWorkout"))
-        } else {
-            alert("Please fill in all fields")
-        }
-    })
-    $("#doneBtn").on("click", function() {
-
-    })
 }
 
 function storeExercise(data) {
@@ -144,20 +142,63 @@ function storeExercise(data) {
     }).catch(err => { console.error(err) })
 }
 
-function displayExercise(data, location) {
+function displayExercise(data, location, exerciseId) {
+    $("#select").val("");
     $("#exercise").val("");
-    $("#things").val("");
     $("#number").val("");
-    const row = $("<div class='row mt-3'>");
-    const exercise = $("<div class='col-sm-6'>").text(data.name)
+    
+    const row = $("<div class='row mb-3'>");
+    const emptyCol1 = $("<div class='col'>");
+    const card = $('<form id ="" class="card" >');
+    const emptyCol2 = $("<div class='col'>");
+    const cardBody = $('<div class="card-body input-group">');
+    if (exerciseId) {
+        cardBody.attr("data-exerciseId", exerciseId)
+    }
+    const exercise = $(`<input id="" class="form-control mr-3" type="text" value="${data.name}" style="border:none;">`);
+    const append = $('<div class="input-group-append">');
     const quantifier = Object.keys(data).filter(key => (key !== "name" && key !== "_id" && key !== "__v"))[0]
     console.log(quantifier)
-    const number = $("<div class='col'>").text(data[quantifier])
-    const thing = $("<div class='col'>").text(quantifier)
-    row.append(exercise)
-    row.append(number)
-    row.append(thing)
+    const number = $(`<input id="" type="number" value="${data[quantifier]}" class="form-control mr-3" style="width:80px;border:none;">`);
+    const select = $(`<select id="" class="form-control mr-3"style="width:100px;border:none;">`).val(quantifier);
+    const reps = $('<option value="reps">').text("Reps");
+    const minutes = $('<option value="minutes">').text("Minutes");
+    const miles = $('<option value="miles">').text("Miles");
+    select.append(reps);
+    select.append(minutes);
+    select.append(miles);
+    append.append(number);
+    append.append(select);
+    cardBody.append(exercise);
+    cardBody.append(append);
+    card.append(cardBody);
+    row.append(emptyCol1)
+    row.append(card);
+    row.append(emptyCol2)
+    select.children(`[value="${quantifier}"]`).prop('selected', true)
     location.append(row)
+    cardBody.on("change", function() {
+        const exercise = $(this).children()[0].value;
+        const number = $(this).children()[1].children[0].value;
+        const quantifier = $(this).children()[1].children[1].value;
+        const exerciseId = $(this).attr("data-exerciseId")
+        updateExercise({
+            name: exercise,
+            [quantifier]: number,
+        }, exerciseId)
+        
+    })
+}
+
+function updateExercise(data, id) {
+    console.log(data)
+    $.ajax({
+        type: "PUT",
+        url: "/api/exercises/" + id,
+        data: data        
+    }).then(result => {
+        console.log(result)
+    }).catch(err => { console.error(err) })
 }
 
 $("#newWorkoutBtn").on("click", createAddWorkout)
