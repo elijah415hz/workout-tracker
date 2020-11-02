@@ -13,3 +13,37 @@ select{
 select::-ms-expand {
     display: none;
 }
+
+#workspace .card, input, option {
+    background-color:#779aeb 
+}
+
+#workspace select {
+    background: #779aeb
+}
+
+#savedWorkouts #currentWorkout {
+    background-color: #BBCCF5
+}
+
+.workoutName {
+    border:none; 
+}
+
+.workoutName:focus {
+    outline: none;
+    border: solid 3px;
+    border-color: #8EB8F7;
+}
+
+#savedWorkouts input, .card, option {
+    background-color: #BBCCF5
+}
+
+#savedWorkouts select {
+    background: #BBCCF5
+}
+
+#workspace input {
+    background-color: #779aeb
+}

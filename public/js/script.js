@@ -8,21 +8,19 @@ $.ajax({
 }).then(workouts => {
     if (workouts.length > 0) {
         for (let workout of workouts) {
-            console.log(workout._id)
             let workoutCard = displayWorkout(workout.name, false, workout._id);
             for (exercise of workout.exercises) {
                 displayExercise(exercise, workoutCard, exercise._id)
             }
-            addExerciseBtn = $(`<button class="btn btn-primary" id="addExerciseBtn">`).html("<i class='fa fa-plus'>")
+            addExerciseBtn = $(`<button class="btn btn-primary mt-3 mx-auto" id="addExerciseBtn" style="display:block;">`).html("<i class='fa fa-plus'>")
             workoutCard.append(addExerciseBtn)
             
             addExerciseBtn.on("click", function () {
                 currentWorkout = workout._id
                 let headerCardBody = $(this).parent()
                 let button = headerCardBody.children().eq(2)
-                console.log(button)
                 button.remove()
-                const doneBtn = $("<button id='doneBtn' class='btn btn-success my-3'>").text("Done")
+                const doneBtn = $("<button id='doneBtn' class='btn btn-success mt-3'>").text("Done")
                 headerCardBody.children().eq(1).after(doneBtn);
                 workspace.append(headerCardBody.parent())
                 displayAddExercise(workspace)
@@ -78,7 +76,7 @@ function storeWorkout(name) {
 
 function displayWorkout(name, newWorkout = true, workoutId) {
     workspace.empty();
-    const header = $('<input id="workoutName" class="display-4 text-center" style="border:none;">').val(name)
+    const header = $('<input class="workoutName display-4 text-center" style="border-radius:6px; height: 1.5em;">').val(name)
     const headerCard = $("<div id='currentWorkout' class='card mb-3'>")
     const headerCardBody = $("<div id='headerBody' class='card-body text-center'>")
     headerCardBody.append(header);
@@ -100,7 +98,7 @@ function displayWorkout(name, newWorkout = true, workoutId) {
     })
 
     if (newWorkout) {
-        const doneBtn = $("<button id='doneBtn' class='btn btn-success my-3'>").text("Done")
+        const doneBtn = $("<button id='doneBtn' class='btn btn-success mt-3'>").text("Done")
         headerCardBody.append(doneBtn)
         workspace.append(headerCard);
         displayAddExercise(workspace)
@@ -131,9 +129,7 @@ function displayWorkout(name, newWorkout = true, workoutId) {
 
 function displayAddExercise(appendLocation) {
     const row = $("<div class='row mb-3'>");
-    const emptyCol1 = $("<div class='col'>");
-    const card = $('<form id ="addExerciseForm" class="card col-md-8 col-sm-12">');
-    const emptyCol2 = $("<div class='col'>");
+    const card = $('<form id ="addExerciseForm" class="card col-md-8 col-sm-12 mx-auto">');
     const cardBody = $('<div class="card-body input-group">');
     const exercise = $('<input id="exercise" class="form-control mr-3" type="text" placeholder="Exercise">');
     const append = $('<div class="input-group-append">');
@@ -152,9 +148,7 @@ function displayAddExercise(appendLocation) {
     cardBody.append(exercise);
     cardBody.append(append);
     card.append(cardBody);
-    row.append(emptyCol1);
     row.append(card);
-    row.append(emptyCol2);
     appendLocation.append(row);
 
     $("#addExerciseForm").on("submit", function (event) {
@@ -162,14 +156,13 @@ function displayAddExercise(appendLocation) {
         const select = $("#select").val()
         const exercise = $("#exercise").val()
         const number = $("#number").val()
-        console.log("Selected: ", select)
         if (select && exercise && number) {
             const data = {
                 name: exercise,
                 [select]: number
             }
             storeExercise(data)
-            displayExercise(data, $("#currentWorkout"))
+            displayExercise(data, $("#headerBody"))
             $("#select").val("");
             $("#exercise").val("");
             $("#number").val("");
@@ -193,7 +186,7 @@ function storeExercise(data) {
 }
 
 function displayExercise(data, appendLocation, exerciseId) {
-    const row = $("<div class='row mb-3'>");
+    const row = $("<div class='row mt-3'>");
     const card = $('<form class="card mx-auto" >');
     const cardBody = $('<div class="card-body input-group">');
     if (exerciseId) {
@@ -207,7 +200,7 @@ function displayExercise(data, appendLocation, exerciseId) {
     const reps = $('<option value="reps">').text("Reps");
     const minutes = $('<option value="minutes">').text("Minutes");
     const miles = $('<option value="miles">').text("Miles");
-    const deleteBtn = $('<button id="deleteBtn" class="btn btn-danger">').html("<i class='fa fa-trash'></i>");
+    const deleteBtn = $('<button class="btn btn-danger deleteBtn">').html("<i class='fa fa-trash'></i>");
     select.append(reps);
     select.append(minutes);
     select.append(miles);
